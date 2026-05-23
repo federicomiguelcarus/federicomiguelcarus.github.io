@@ -1,0 +1,839 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Carus Imports</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --black: #0a0a0a;
+      --white: #f5f5f0;
+      --gray: #888;
+      --light-gray: #e8e8e4;
+      --accent: #1a1a1a;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--white);
+      color: var(--black);
+      min-height: 100vh;
+    }
+
+    /* ── HEADER ── */
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: var(--black);
+      color: var(--white);
+      padding: 0 1.5rem;
+      height: 60px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid #222;
+    }
+
+    .logo {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.4rem;
+      font-weight: 900;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .header-tag {
+      font-size: 0.7rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--gray);
+    }
+
+    /* ── HERO ── */
+    .hero {
+      background: var(--black);
+      color: var(--white);
+      padding: 4rem 1.5rem 3rem;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: repeating-linear-gradient(
+        0deg,
+        transparent,
+        transparent 39px,
+        rgba(255,255,255,0.03) 39px,
+        rgba(255,255,255,0.03) 40px
+      );
+      pointer-events: none;
+    }
+
+    .hero h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(2.5rem, 8vw, 5rem);
+      font-weight: 900;
+      line-height: 1.05;
+      margin-bottom: 0.8rem;
+      letter-spacing: -0.02em;
+    }
+
+    .hero p {
+      font-size: 0.95rem;
+      color: #aaa;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      font-weight: 300;
+    }
+
+    /* ── FILTER BAR ── */
+    .filter-bar {
+      padding: 1rem 1.5rem;
+      display: flex;
+      gap: 0.5rem;
+      overflow-x: auto;
+      border-bottom: 1px solid var(--light-gray);
+      background: var(--white);
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+    }
+    .filter-bar::-webkit-scrollbar { display: none; }
+
+    .filter-btn {
+      flex-shrink: 0;
+      padding: 0.4rem 1rem;
+      border: 1.5px solid var(--black);
+      background: transparent;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.75rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      cursor: pointer;
+      border-radius: 100px;
+      transition: all 0.2s;
+      color: var(--black);
+    }
+
+    .filter-btn.active,
+    .filter-btn:hover {
+      background: var(--black);
+      color: var(--white);
+    }
+
+    /* ── GRID ── */
+    .catalog {
+      padding: 2rem 1rem 4rem;
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+      gap: 1.2rem;
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+
+    @media (min-width: 600px) {
+      .catalog { grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 1.5rem; }
+    }
+
+    /* ── CARD ── */
+    .card {
+      background: #fff;
+      border: 1px solid var(--light-gray);
+      border-radius: 4px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      transition: transform 0.25s, box-shadow 0.25s;
+      cursor: pointer;
+      animation: fadeUp 0.5s ease both;
+    }
+
+    .card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 12px 32px rgba(0,0,0,0.12);
+    }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(16px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .card-img-wrap {
+      aspect-ratio: 1 / 1;
+      overflow: hidden;
+      background: var(--light-gray);
+      position: relative;
+    }
+
+    .card-img-wrap img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.4s ease;
+      display: block;
+    }
+
+    .card:hover .card-img-wrap img { transform: scale(1.06); }
+
+    .card-badge {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      background: var(--black);
+      color: var(--white);
+      font-size: 0.6rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      padding: 3px 8px;
+      border-radius: 2px;
+    }
+
+    .card-body {
+      padding: 0.9rem 0.8rem 1rem;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 0.3rem;
+    }
+
+    .card-cat {
+      font-size: 0.65rem;
+      text-transform: uppercase;
+      letter-spacing: 0.16em;
+      color: var(--gray);
+    }
+
+    .card-name {
+      font-family: 'Playfair Display', serif;
+      font-size: 1rem;
+      font-weight: 700;
+      line-height: 1.3;
+      color: var(--black);
+    }
+
+    .card-desc {
+      font-size: 0.78rem;
+      color: #666;
+      line-height: 1.5;
+      flex: 1;
+      margin-top: 0.2rem;
+    }
+
+    .card-footer {
+      padding: 0.6rem 0.8rem 0.9rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-top: 1px solid var(--light-gray);
+    }
+
+    .card-price {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.15rem;
+      font-weight: 700;
+    }
+
+    .card-btn {
+      background: var(--black);
+      color: var(--white);
+      border: none;
+      padding: 0.45rem 0.9rem;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.7rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      border-radius: 2px;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .card-btn:hover { background: #333; }
+
+    /* ── MODAL ── */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.7);
+      z-index: 200;
+      display: flex;
+      align-items: flex-end;
+      justify-content: center;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s;
+    }
+
+    .modal-overlay.open {
+      opacity: 1;
+      pointer-events: all;
+    }
+
+    @media (min-width: 600px) {
+      .modal-overlay { align-items: center; }
+    }
+
+    .modal {
+      background: var(--white);
+      width: 100%;
+      max-width: 480px;
+      border-radius: 12px 12px 0 0;
+      overflow: hidden;
+      transform: translateY(40px);
+      transition: transform 0.35s cubic-bezier(0.34,1.56,0.64,1);
+      max-height: 90vh;
+      overflow-y: auto;
+    }
+
+    @media (min-width: 600px) {
+      .modal { border-radius: 8px; transform: scale(0.92); }
+      .modal-overlay.open .modal { transform: scale(1); }
+    }
+
+    .modal-overlay.open .modal { transform: translateY(0); }
+
+    .modal-img {
+      width: 100%;
+      aspect-ratio: 4/3;
+      object-fit: cover;
+      background: var(--light-gray);
+    }
+
+    .modal-content { padding: 1.5rem; }
+
+    .modal-cat {
+      font-size: 0.65rem;
+      text-transform: uppercase;
+      letter-spacing: 0.18em;
+      color: var(--gray);
+      margin-bottom: 0.4rem;
+    }
+
+    .modal-name {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.6rem;
+      font-weight: 900;
+      margin-bottom: 0.7rem;
+    }
+
+    .modal-desc {
+      font-size: 0.9rem;
+      color: #555;
+      line-height: 1.6;
+      margin-bottom: 1.2rem;
+    }
+
+    .modal-price {
+      font-family: 'Playfair Display', serif;
+      font-size: 2rem;
+      font-weight: 700;
+      margin-bottom: 1.2rem;
+    }
+
+    .modal-cta {
+      width: 100%;
+      background: var(--black);
+      color: var(--white);
+      border: none;
+      padding: 1rem;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.85rem;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      border-radius: 3px;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .modal-cta:hover { background: #333; }
+
+    .modal-close {
+      position: absolute;
+      top: 12px;
+      right: 14px;
+      background: rgba(0,0,0,0.5);
+      color: #fff;
+      border: none;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      font-size: 1.1rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      line-height: 1;
+    }
+
+    .modal-img-wrap { position: relative; }
+
+    /* ── EMPTY ── */
+    .empty {
+      grid-column: 1 / -1;
+      text-align: center;
+      padding: 4rem 1rem;
+      color: var(--gray);
+      font-size: 0.9rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+
+    /* ── FLOATING SOCIAL BUTTONS ── */
+    .social-float {
+      position: fixed;
+      bottom: 1.4rem;
+      right: 1.2rem;
+      z-index: 150;
+      display: flex;
+      flex-direction: column;
+      gap: 0.7rem;
+      align-items: flex-end;
+    }
+
+    .fab {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0 1rem 0 0.75rem;
+      height: 48px;
+      border-radius: 100px;
+      text-decoration: none;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.75rem;
+      font-weight: 500;
+      letter-spacing: 0.06em;
+      box-shadow: 0 4px 18px rgba(0,0,0,0.25);
+      transition: transform 0.2s, box-shadow 0.2s, width 0.3s;
+      overflow: hidden;
+      white-space: nowrap;
+      max-width: 48px;
+    }
+
+    .fab:hover {
+      transform: translateY(-2px) scale(1.04);
+      box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+      max-width: 180px;
+    }
+
+    .fab-icon {
+      flex-shrink: 0;
+      width: 26px;
+      height: 26px;
+    }
+
+    .fab-label {
+      opacity: 0;
+      transition: opacity 0.2s 0.1s;
+      font-size: 0.8rem;
+    }
+
+    .fab:hover .fab-label { opacity: 1; }
+
+    .fab-wa {
+      background: #25D366;
+      color: #fff;
+    }
+
+    .fab-ig {
+      background: #111;
+      color: #fff;
+      border: 1px solid #333;
+    }
+
+    /* ── MODAL SOCIAL BUTTONS ── */
+    .modal-actions {
+      display: flex;
+      gap: 0.6rem;
+      margin-top: 0.8rem;
+    }
+
+    .modal-social-btn {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      padding: 0.75rem;
+      border-radius: 3px;
+      text-decoration: none;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.75rem;
+      font-weight: 500;
+      letter-spacing: 0.08em;
+      border: none;
+      cursor: pointer;
+      transition: opacity 0.2s;
+    }
+    .modal-social-btn:hover { opacity: 0.85; }
+
+    .modal-social-btn.wa { background: #25D366; color: #fff; }
+    .modal-social-btn.ig { background: #111; color: #fff; border: 1px solid #333; }
+
+    /* ── HEADER SOCIAL ICONS ── */
+    .header-icons {
+      display: flex;
+      gap: 0.8rem;
+      align-items: center;
+    }
+
+    .header-icon {
+      display: flex;
+      align-items: center;
+      color: #aaa;
+      transition: color 0.2s;
+      text-decoration: none;
+    }
+    .header-icon:hover { color: #fff; }
+
+    /* ── FOOTER ── */
+    footer {
+      background: var(--black);
+      color: #555;
+      text-align: center;
+      padding: 2rem 1rem;
+      font-size: 0.72rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    footer span { color: #888; }
+
+    .footer-social {
+      display: flex;
+      justify-content: center;
+      gap: 1.2rem;
+      margin-bottom: 1rem;
+    }
+
+    .footer-social a {
+      color: #555;
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+    .footer-social a:hover { color: #fff; }
+  </style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header>
+  <div class="logo">Carus Imports</div>
+  <div class="header-icons">
+    <!-- Reemplaza TU_NUMERO por tu número con código de país sin + ni espacios, ej: 56912345678 -->
+    <a href="https://wa.me/TU_NUMERO" target="_blank" class="header-icon" title="WhatsApp">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+    </a>
+    <!-- Reemplaza tu_usuario por tu usuario de Instagram sin @ -->
+    <a href="https://instagram.com/tu_usuario" target="_blank" class="header-icon" title="Instagram">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/></svg>
+    </a>
+  </div>
+</header>
+
+<!-- HERO -->
+<section class="hero">
+  <h1>Carus<br/>Imports</h1>
+  <p>Calidad que se ve y se siente</p>
+</section>
+
+<!-- FILTER BAR -->
+<div class="filter-bar" id="filterBar">
+  <button class="filter-btn active" onclick="filterProducts('todos', this)">Todos</button>
+</div>
+
+<!-- CATALOG GRID -->
+<div class="catalog" id="catalog"></div>
+
+<!-- MODAL -->
+<div class="modal-overlay" id="modalOverlay" onclick="closeModal(event)">
+  <div class="modal" id="modal">
+    <div class="modal-img-wrap">
+      <img src="" alt="" id="modalImg" class="modal-img" />
+      <button class="modal-close" onclick="closeModalDirect()">✕</button>
+    </div>
+    <div class="modal-content">
+      <div class="modal-cat" id="modalCat"></div>
+      <div class="modal-name" id="modalName"></div>
+      <div class="modal-desc" id="modalDesc"></div>
+      <div class="modal-price" id="modalPrice"></div>
+      <div class="modal-actions">
+        <a id="modalWaBtn" href="#" target="_blank" class="modal-social-btn wa">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="white"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+          WhatsApp
+        </a>
+        <a id="modalIgBtn" href="https://instagram.com/tu_usuario" target="_blank" class="modal-social-btn ig">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="white"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/></svg>
+          Instagram
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- FLOATING SOCIAL BUTTONS -->
+<div class="social-float">
+  <!-- Reemplaza TU_NUMERO por tu número con código de país sin + ni espacios, ej: 56912345678 -->
+  <a href="https://wa.me/TU_NUMERO" target="_blank" class="fab fab-wa" title="WhatsApp">
+    <svg class="fab-icon" viewBox="0 0 24 24" fill="white"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+    <span class="fab-label">WhatsApp</span>
+  </a>
+  <!-- Reemplaza tu_usuario por tu usuario de Instagram sin @ -->
+  <a href="https://instagram.com/tu_usuario" target="_blank" class="fab fab-ig" title="Instagram">
+    <svg class="fab-icon" viewBox="0 0 24 24" fill="white"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/></svg>
+    <span class="fab-label">Instagram</span>
+  </a>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-social">
+    <a href="https://wa.me/TU_NUMERO" target="_blank" title="WhatsApp">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+    </a>
+    <a href="https://instagram.com/tu_usuario" target="_blank" title="Instagram">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/></svg>
+    </a>
+  </div>
+  <span>© 2025 Carus Imports</span> — Todos los derechos reservados
+</footer>
+
+<script>
+// ═══════════════════════════════════════════════════════════════
+//  CONFIGURACIÓN — Solo hay que tocar este bloque
+// ═══════════════════════════════════════════════════════════════
+
+// 1. TOKEN de Airtable (Personal Access Token)
+//    Ir a: airtable.com → tu foto de perfil → Developer Hub → Personal access tokens → Create token
+//    Permisos necesarios: data.records:read  |  Acceso a tu base "Carus Imports"
+const AIRTABLE_TOKEN = 'TU_TOKEN_AQUI';
+
+// 2. ID de la base (aparece en la URL al abrir la base en Airtable: airtable.com/appXXXXXXXX/...)
+const AIRTABLE_BASE_ID = 'appXXXXXXXX';
+
+// 3. Nombre exacto de la tabla dentro de la base
+const AIRTABLE_TABLE = 'Productos';
+
+// 4. WhatsApp: número con código de país, sin +, sin espacios (ej: 56912345678)
+const WA_NUMBER = 'TU_NUMERO';
+
+// 5. Instagram: usuario sin @
+const IG_USER = 'tu_usuario';
+
+// ═══════════════════════════════════════════════════════════════
+//  Columnas esperadas en Airtable (deben llamarse exactamente así)
+//  nombre | categoria | descripcion | precio | badge | imagen
+// ═══════════════════════════════════════════════════════════════
+
+let allProducts = [];
+let activeCategory = 'todos';
+
+// ── CARGA DESDE AIRTABLE ────────────────────────────────────────
+async function loadFromAirtable() {
+  showLoading(true);
+
+  // Si no se han configurado las credenciales, mostrar productos de ejemplo
+  if (AIRTABLE_TOKEN === 'TU_TOKEN_AQUI' || AIRTABLE_BASE_ID === 'appXXXXXXXX') {
+    allProducts = getDemoProducts();
+    showLoading(false);
+    buildFilters();
+    renderProducts();
+    showConfigBanner();
+    return;
+  }
+
+  try {
+    const url = `https://api.airtable.com/v0/${AIRTABLE_BASE_ID}/${encodeURIComponent(AIRTABLE_TABLE)}?view=Grid%20view`;
+    const res = await fetch(url, {
+      headers: { Authorization: `Bearer ${AIRTABLE_TOKEN}` }
+    });
+
+    if (!res.ok) throw new Error(`Error ${res.status}`);
+
+    const data = await res.json();
+
+    allProducts = data.records.map(r => {
+      const f = r.fields;
+      // La columna "imagen" en Airtable es un adjunto (array de objetos)
+      const imgUrl = Array.isArray(f.imagen) && f.imagen.length > 0
+        ? f.imagen[0].url
+        : 'https://placehold.co/600x600/e8e8e4/888?text=Sin+imagen';
+      return {
+        name:        f.nombre      || 'Sin nombre',
+        category:    f.categoria   || 'General',
+        description: f.descripcion || '',
+        price:       f.precio      || '',
+        badge:       f.badge       || '',
+        image:       imgUrl
+      };
+    });
+
+    showLoading(false);
+    buildFilters();
+    renderProducts();
+
+  } catch (err) {
+    console.error('Error cargando desde Airtable:', err);
+    allProducts = getDemoProducts();
+    showLoading(false);
+    buildFilters();
+    renderProducts();
+    showErrorBanner();
+  }
+}
+
+// ── BANNER: configuración pendiente ────────────────────────────
+function showConfigBanner() {
+  const banner = document.createElement('div');
+  banner.style.cssText = `
+    background:#1a1a1a; color:#aaa; text-align:center;
+    padding:0.7rem 1rem; font-size:0.72rem; letter-spacing:0.1em;
+    text-transform:uppercase; border-bottom:1px solid #333;
+  `;
+  banner.innerHTML = '⚙️ &nbsp;Modo demo — Configura tu token de Airtable en el código para ver tus productos reales';
+  document.querySelector('header').after(banner);
+}
+
+function showErrorBanner() {
+  const banner = document.createElement('div');
+  banner.style.cssText = `
+    background:#2a0a0a; color:#f88; text-align:center;
+    padding:0.7rem 1rem; font-size:0.72rem; letter-spacing:0.1em;
+    text-transform:uppercase; border-bottom:1px solid #500;
+  `;
+  banner.innerHTML = '⚠️ &nbsp;No se pudo conectar con Airtable — Revisa el token y el ID de la base';
+  document.querySelector('header').after(banner);
+}
+
+// ── LOADING ─────────────────────────────────────────────────────
+function showLoading(show) {
+  const catalog = document.getElementById('catalog');
+  if (show) {
+    catalog.innerHTML = `
+      <div style="grid-column:1/-1; text-align:center; padding:4rem 1rem; color:var(--gray);">
+        <div style="font-size:0.8rem;letter-spacing:0.2em;text-transform:uppercase;animation:pulse 1.2s infinite;">
+          Cargando productos...
+        </div>
+      </div>`;
+  }
+}
+
+// ── FILTROS ──────────────────────────────────────────────────────
+function buildFilters() {
+  const bar = document.getElementById('filterBar');
+  // Limpiar filtros previos excepto "Todos"
+  bar.innerHTML = `<button class="filter-btn active" onclick="filterProducts('todos', this)">Todos</button>`;
+  const cats = [...new Set(allProducts.map(p => p.category))];
+  cats.forEach(cat => {
+    const btn = document.createElement('button');
+    btn.className = 'filter-btn';
+    btn.textContent = cat;
+    btn.onclick = function() { filterProducts(cat, this); };
+    bar.appendChild(btn);
+  });
+}
+
+function filterProducts(cat, btn) {
+  activeCategory = cat;
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderProducts();
+}
+
+// ── RENDER ───────────────────────────────────────────────────────
+function renderProducts() {
+  const catalog = document.getElementById('catalog');
+  const filtered = activeCategory === 'todos'
+    ? allProducts
+    : allProducts.filter(p => p.category === activeCategory);
+
+  catalog.innerHTML = '';
+
+  if (filtered.length === 0) {
+    catalog.innerHTML = '<div class="empty">Sin productos en esta categoría</div>';
+    return;
+  }
+
+  filtered.forEach((p, i) => {
+    const card = document.createElement('div');
+    card.className = 'card';
+    card.style.animationDelay = `${i * 0.07}s`;
+    const idx = allProducts.indexOf(p);
+    card.innerHTML = `
+      <div class="card-img-wrap">
+        <img src="${p.image}" alt="${p.name}" loading="lazy" />
+        ${p.badge ? `<span class="card-badge">${p.badge}</span>` : ''}
+      </div>
+      <div class="card-body">
+        <div class="card-cat">${p.category}</div>
+        <div class="card-name">${p.name}</div>
+        <div class="card-desc">${p.description}</div>
+      </div>
+      <div class="card-footer">
+        <div class="card-price">${p.price}</div>
+        <button class="card-btn" onclick="openModal(${idx})">Ver más</button>
+      </div>
+    `;
+    catalog.appendChild(card);
+  });
+}
+
+// ── MODAL ────────────────────────────────────────────────────────
+function openModal(idx) {
+  const p = allProducts[idx];
+  document.getElementById('modalImg').src = p.image;
+  document.getElementById('modalImg').alt = p.name;
+  document.getElementById('modalCat').textContent = p.category;
+  document.getElementById('modalName').textContent = p.name;
+  document.getElementById('modalDesc').textContent = p.description;
+  document.getElementById('modalPrice').textContent = p.price;
+
+  const waMsg = encodeURIComponent(`Hola! Me interesa el producto: ${p.name} (${p.price})`);
+  document.getElementById('modalWaBtn').href = `https://wa.me/${WA_NUMBER}?text=${waMsg}`;
+  document.getElementById('modalIgBtn').href = `https://instagram.com/${IG_USER}`;
+
+  document.getElementById('modalOverlay').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeModal(e) {
+  if (e.target === document.getElementById('modalOverlay')) closeModalDirect();
+}
+
+function closeModalDirect() {
+  document.getElementById('modalOverlay').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModalDirect(); });
+
+// ── PRODUCTOS DE DEMO (mientras no hay Airtable conectado) ───────
+function getDemoProducts() {
+  return [
+    { name:"Producto Ejemplo 1", category:"Categoría A", description:"Descripción del producto. Conéctate a Airtable para ver tus productos reales.", price:"$25.000", badge:"Nuevo",     image:"https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=600&q=80" },
+    { name:"Producto Ejemplo 2", category:"Categoría B", description:"Descripción del producto. Conéctate a Airtable para ver tus productos reales.", price:"$18.500", badge:"",          image:"https://images.unsplash.com/photo-1585386959984-a4155224a1ad?w=600&q=80" },
+    { name:"Producto Ejemplo 3", category:"Categoría A", description:"Descripción del producto. Conéctate a Airtable para ver tus productos reales.", price:"$42.000", badge:"Destacado", image:"https://images.unsplash.com/photo-1491553895911-0055eca6402d?w=600&q=80" },
+    { name:"Producto Ejemplo 4", category:"Categoría C", description:"Descripción del producto. Conéctate a Airtable para ver tus productos reales.", price:"$9.990",  badge:"",          image:"https://images.unsplash.com/photo-1556742044-3c52d6e88c62?w=600&q=80" },
+    { name:"Producto Ejemplo 5", category:"Categoría B", description:"Descripción del producto. Conéctate a Airtable para ver tus productos reales.", price:"$33.000", badge:"Oferta",    image:"https://images.unsplash.com/photo-1526170375885-4d8ecf77b99f?w=600&q=80" },
+    { name:"Producto Ejemplo 6", category:"Categoría C", description:"Descripción del producto. Conéctate a Airtable para ver tus productos reales.", price:"$15.000", badge:"",          image:"https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=600&q=80" }
+  ];
+}
+
+// ── SOCIAL LINKS ─────────────────────────────────────────────────
+document.querySelectorAll('a[href*="wa.me/TU_NUMERO"]').forEach(a => {
+  a.href = a.href.replace('TU_NUMERO', WA_NUMBER);
+});
+document.querySelectorAll('a[href*="instagram.com/tu_usuario"]').forEach(a => {
+  a.href = `https://instagram.com/${IG_USER}`;
+});
+
+// ── INIT ─────────────────────────────────────────────────────────
+loadFromAirtable();
+</script>
+</body>
+</html>
