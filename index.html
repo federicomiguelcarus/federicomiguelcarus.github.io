@@ -604,52 +604,24 @@
 </footer>
 
 <script>
-// ═══════════════════════════════════════════════════════════════
-//  CONFIGURACIÓN — Solo hay que tocar este bloque
-// ═══════════════════════════════════════════════════════════════
-
-// 1. TOKEN de Airtable (Personal Access Token)
-//    Ir a: airtable.com → tu foto de perfil → Developer Hub → Personal access tokens → Create token
-//    Permisos necesarios: data.records:read  |  Acceso a tu base "Carus Imports"
-const AIRTABLE_TOKEN = 'patN4aQEcIzV86AyR.7098eb776059f54901dd5b6457f6fff6ab46e3b52b0775e9d691920c0d3eb765';
-
-// 2. ID de la base (aparece en la URL al abrir la base en Airtable: airtable.com/appXXXXXXXX/...)
 const AIRTABLE_BASE_ID = 'appemT8bk6EovlI5f';
-
-// 3. Nombre exacto de la tabla dentro de la base
-const AIRTABLE_TABLE = 'Productos';
-
-// 4. WhatsApp: número con código de país, sin +, sin espacios (ej: 56912345678)
-const WA_NUMBER = 542396611945';
-
-// 5. Instagram: usuario sin @
-const IG_USER = 'carusimports';
-
-// ═══════════════════════════════════════════════════════════════
-//  Columnas esperadas en Airtable (deben llamarse exactamente así)
-//  nombre | categoria | descripcion | precio | badge | imagen
-// ═══════════════════════════════════════════════════════════════
+const AIRTABLE_TABLE   = 'Productos';
+const AIRTABLE_TOKEN   = 'patN4aQEcIzV86AyR.7098eb776059f54901dd5b6457f6fff6ab46e3b52b0775e9d691920c0d3eb765';
+const WA_NUMBER        = '542396611945';
+const IG_USER          = 'carusimports';
 
 let allProducts = [];
 let activeCategory = 'todos';
 
-// ── CARGA DESDE AIRTABLE ────────────────────────────────────────
+// ── CARGA DESDE AIRTABLE (via proxy público para evitar CORS) ───
 async function loadFromAirtable() {
   showLoading(true);
-
-  // Si no se han configurado las credenciales, mostrar productos de ejemplo
-  if (AIRTABLE_TOKEN === 'TU_TOKEN_AQUI' || AIRTABLE_BASE_ID === 'appXXXXXXXX') {
-    allProducts = getDemoProducts();
-    showLoading(false);
-    buildFilters();
-    renderProducts();
-    showConfigBanner();
-    return;
-  }
-
   try {
-    const url = `https://api.airtable.com/v0/${AIRTABLE_BASE_ID}/${encodeURIComponent(AIRTABLE_TABLE)}?view=Grid%20view`;
-    const res = await fetch(url, {
+    // Usamos un proxy CORS abierto para evitar el bloqueo del navegador
+    const apiUrl = `https://api.airtable.com/v0/${AIRTABLE_BASE_ID}/${encodeURIComponent(AIRTABLE_TABLE)}`;
+    const proxyUrl = `https://corsproxy.io/?${encodeURIComponent(apiUrl)}`;
+
+    const res = await fetch(proxyUrl, {
       headers: { Authorization: `Bearer ${AIRTABLE_TOKEN}` }
     });
 
@@ -659,7 +631,6 @@ async function loadFromAirtable() {
 
     allProducts = data.records.map(r => {
       const f = r.fields;
-      // La columna "imagen" en Airtable es un adjunto (array de objetos)
       const imgUrl = Array.isArray(f.imagen) && f.imagen.length > 0
         ? f.imagen[0].url
         : 'https://placehold.co/600x600/e8e8e4/888?text=Sin+imagen';
@@ -679,35 +650,10 @@ async function loadFromAirtable() {
 
   } catch (err) {
     console.error('Error cargando desde Airtable:', err);
-    allProducts = getDemoProducts();
     showLoading(false);
-    buildFilters();
-    renderProducts();
-    showErrorBanner();
+    document.getElementById('catalog').innerHTML = `
+      <div class="empty">No se pudieron cargar los productos.<br>Verificá tu conexión a internet.</div>`;
   }
-}
-
-// ── BANNER: configuración pendiente ────────────────────────────
-function showConfigBanner() {
-  const banner = document.createElement('div');
-  banner.style.cssText = `
-    background:#1a1a1a; color:#aaa; text-align:center;
-    padding:0.7rem 1rem; font-size:0.72rem; letter-spacing:0.1em;
-    text-transform:uppercase; border-bottom:1px solid #333;
-  `;
-  banner.innerHTML = '⚙️ &nbsp;Modo demo — Configura tu token de Airtable en el código para ver tus productos reales';
-  document.querySelector('header').after(banner);
-}
-
-function showErrorBanner() {
-  const banner = document.createElement('div');
-  banner.style.cssText = `
-    background:#2a0a0a; color:#f88; text-align:center;
-    padding:0.7rem 1rem; font-size:0.72rem; letter-spacing:0.1em;
-    text-transform:uppercase; border-bottom:1px solid #500;
-  `;
-  banner.innerHTML = '⚠️ &nbsp;No se pudo conectar con Airtable — Revisa el token y el ID de la base';
-  document.querySelector('header').after(banner);
 }
 
 // ── LOADING ─────────────────────────────────────────────────────
@@ -811,18 +757,6 @@ function closeModalDirect() {
 }
 
 document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModalDirect(); });
-
-// ── PRODUCTOS DE DEMO (mientras no hay Airtable conectado) ───────
-function getDemoProducts() {
-  return [
-    { name:"Producto Ejemplo 1", category:"Categoría A", description:"Descripción del producto. Conéctate a Airtable para ver tus productos reales.", price:"$25.000", badge:"Nuevo",     image:"https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=600&q=80" },
-    { name:"Producto Ejemplo 2", category:"Categoría B", description:"Descripción del producto. Conéctate a Airtable para ver tus productos reales.", price:"$18.500", badge:"",          image:"https://images.unsplash.com/photo-1585386959984-a4155224a1ad?w=600&q=80" },
-    { name:"Producto Ejemplo 3", category:"Categoría A", description:"Descripción del producto. Conéctate a Airtable para ver tus productos reales.", price:"$42.000", badge:"Destacado", image:"https://images.unsplash.com/photo-1491553895911-0055eca6402d?w=600&q=80" },
-    { name:"Producto Ejemplo 4", category:"Categoría C", description:"Descripción del producto. Conéctate a Airtable para ver tus productos reales.", price:"$9.990",  badge:"",          image:"https://images.unsplash.com/photo-1556742044-3c52d6e88c62?w=600&q=80" },
-    { name:"Producto Ejemplo 5", category:"Categoría B", description:"Descripción del producto. Conéctate a Airtable para ver tus productos reales.", price:"$33.000", badge:"Oferta",    image:"https://images.unsplash.com/photo-1526170375885-4d8ecf77b99f?w=600&q=80" },
-    { name:"Producto Ejemplo 6", category:"Categoría C", description:"Descripción del producto. Conéctate a Airtable para ver tus productos reales.", price:"$15.000", badge:"",          image:"https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=600&q=80" }
-  ];
-}
 
 // ── SOCIAL LINKS ─────────────────────────────────────────────────
 document.querySelectorAll('a[href*="wa.me/TU_NUMERO"]').forEach(a => {
